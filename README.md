@@ -15,12 +15,12 @@ A comprehensive facial recognition system with web-based validation interface, a
 - **Validation Interface** (🟢): Review and correct misidentified faces with intuitive controls
 - **Training Dashboard** (🔵): Dedicated retraining interface with progress tracking and time estimates
 - **Statistics Portal** (🟣): Comprehensive performance metrics and analytics dashboard
-- **Mobile Responsive**: Optimized experience across desktop, tablet, and mobile devices
 
 ### 🚀 **User Experience**
-- **Color-Coded Navigation**: Visual organization makes it easy to find the right function
+- **Color-Coded Navigation**: Green (validation), Blue (training), Purple (statistics)
 - **Real-time Feedback**: Instant confirmation of actions and status updates
-- **Progress Tracking**: Visual indicators during model training with time tracking
+- **Progress Tracking**: Visual indicators during model training with time estimates
+- **Mobile Responsive**: Optimized interface works on desktop, tablet, and mobile
 - **Intuitive Design**: Clean, modern interface with consistent navigation patterns
 
 ## 🚀 Quick Start
@@ -111,30 +111,7 @@ Start the web application server:
 python web_validation.py
 ```
 
-Visit http://localhost:5000 to access the complete web interface with:
-
-#### **Landing Page (/)** 
-- System overview and feature descriptions
-- Quick navigation to all system components
-- Getting started instructions
-
-#### **Validation Page (/validation)**
-- Review pending face detections
-- Mark identifications as correct or incorrect
-- Correct misidentified faces by selecting the right person
-- Real-time validation with instant feedback
-
-#### **Training Page (/retrain)**  
-- View training data statistics and feedback overview
-- Trigger model retraining with user corrections
-- Monitor training progress with visual indicators
-- View recent corrections and training history
-
-#### **Statistics Page (/stats)**
-- System performance metrics and accuracy rates
-- Detection progress tracking
-- Visual charts and analytics
-- Performance trends over time
+Visit http://localhost:5000 to access the complete web interface. See the [Web Interface](#-web-interface) section below for detailed page descriptions.
 
 ### 2. Face Recognition Processing
 
@@ -217,7 +194,9 @@ FaceRec/
 ├── ha_integration.py        # Home Assistant integration
 │
 ├── templates/               # HTML templates
-│   ├── validation.html      # Main validation interface
+│   ├── index.html          # Landing page
+│   ├── validation.html      # Validation interface  
+│   ├── retrain.html        # Training interface
 │   └── stats.html          # Statistics dashboard
 │
 ├── static/                  # Static web assets
@@ -294,11 +273,6 @@ The web interface features a **color-coded design** for easy navigation:
 4. **Rebuild**: Reconstruct the face recognition model with progress tracking
 5. **Validation**: Mark processed feedback to avoid reprocessing
 
-### User Experience
-- **Intuitive Navigation**: Color-coded pages make it easy to find the right function
-- **Progress Tracking**: Real-time feedback during training with time estimates
-- **Mobile Responsive**: Optimized interface works on desktop, tablet, and mobile
-- **Instant Feedback**: Immediate confirmation of actions and status updates
 
 ## 📊 Database Schema
 
@@ -438,18 +412,9 @@ For issues and questions:
 - ✅ Mobile-responsive design
 
 ### 🔮 **Upcoming Features (v2.0)**
-- 📷 **Real-time Camera Integration**
-  - USB and Raspberry Pi camera support
-  - Motion sensor triggered capture
-  - Automatic image processing pipeline
-- 🔄 **Enhanced Automation**
-  - Continuous monitoring mode
-  - Smart notification system
-  - Automated security alerts
-- 📊 **Advanced Analytics** 
-  - Time-based analytics
-  - Person frequency tracking
-  - Custom reporting features
+- 📷 **Real-time Camera Integration** (see [Face Recognition Processing](#2-face-recognition-processing) for details)
+- 🔄 **Enhanced Automation**: Continuous monitoring and smart notifications
+- 📊 **Advanced Analytics**: Time-based analytics and custom reporting
 
 ### 💡 **Future Considerations**
 - Multi-camera support
