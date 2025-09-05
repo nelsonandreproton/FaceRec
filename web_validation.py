@@ -141,7 +141,12 @@ validation_app = ValidationApp()
 
 @app.route('/')
 def index():
-    """Página principal com lista de detecções pendentes"""
+    """Página principal com instruções e navegação"""
+    return render_template('index.html')
+
+@app.route('/validation')
+def validation():
+    """Página de validação com lista de detecções pendentes"""
     detections = validation_app.get_pending_detections()
     people = validation_app.get_all_people()
     stats = validation_app.get_detection_stats()
@@ -176,9 +181,17 @@ def serve_image(filename):
 
 @app.route('/stats')
 def stats():
-    """Página de estatísticas"""
+    """Statistics page"""
     stats = validation_app.get_detection_stats()
     return render_template('stats.html', stats=stats)
+
+@app.route('/retrain')
+def retrain():
+    """Model retraining page"""
+    from retrain_model import RetainModel
+    retrainer = RetainModel()
+    retrain_stats = retrainer.get_retrain_stats()
+    return render_template('retrain.html', retrain_stats=retrain_stats)
 
 @app.route('/api/retrain', methods=['POST'])
 def trigger_retrain():

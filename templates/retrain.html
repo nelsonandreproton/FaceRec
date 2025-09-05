@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Retraining - Face Recognition System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .nav-links {
+            background: #f8f9fa;
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .nav-links a {
+            color: #3498db;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+            transition: color 0.3s ease;
+            padding: 8px 15px;
+            border-radius: 5px;
+        }
+        
+        .nav-links a:hover {
+            color: #2980b9;
+            background: #ecf0f1;
+        }
+        
+        .nav-links a.validation-active {
+            color: #27ae60;
+            background: #e8f5e8;
+        }
+        
+        .nav-links a.training-active {
+            color: #3498db;
+            background: #e3f2fd;
+        }
+        
+        .nav-links a.stats-active {
+            color: #9b59b6;
+            background: #f4ecf7;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .stats-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        
+        .pending {
+            color: #e74c3c;
+        }
+        
+        .processed {
+            color: #27ae60;
+        }
+        
+        .info-section {
+            background: #e8f4fd;
+            border: 1px solid #3498db;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .info-section h3 {
+            color: #2980b9;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .info-section p {
+            color: #34495e;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        
+        .retrain-section {
+            text-align: center;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .retrain-section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        
+        .retrain-section p {
+            color: #7f8c8d;
+            margin-bottom: 25px;
+            font-size: 1.1em;
+        }
+        
+        .btn-retrain {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(155, 89, 182, 0.3);
+        }
+        
+        .btn-retrain:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(155, 89, 182, 0.4);
+        }
+        
+        .btn-retrain:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .progress-section {
+            display: none;
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .progress-section h4 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+        
+        .progress-text {
+            color: #856404;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+        
+        .result-section {
+            display: none;
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .result-section.success {
+            background: #d4edda;
+            border: 1px solid #28a745;
+            color: #155724;
+        }
+        
+        .result-section.error {
+            background: #f8d7da;
+            border: 1px solid #dc3545;
+            color: #721c24;
+        }
+        
+        .recent-corrections {
+            margin-top: 30px;
+        }
+        
+        .recent-corrections h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .corrections-list {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .correction-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .correction-item:last-child {
+            border-bottom: none;
+        }
+        
+        .correction-name {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .correction-date {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: #27ae60;
+            color: white;
+            border-radius: 5px;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .toast.error {
+            background: #e74c3c;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+            
+            .nav-links {
+                padding: 10px;
+            }
+            
+            .nav-links a {
+                display: block;
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔄 Model Retraining</h1>
+            <p>Improve model accuracy with user feedback</p>
+        </div>
+        
+        <div class="nav-links">
+            <a href="/">🏠 Home</a>
+            <a href="/validation">🔍 Validation</a>
+            <a href="/retrain" class="active training-active">🔄 Training</a>
+            <a href="/stats">📈 Statistics</a>
+        </div>
+        
+        <div class="content">
+            <div class="stats-section">
+                <h2 style="text-align: center; margin-bottom: 20px; color: #2c3e50;">Training Data Overview</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">{{ retrain_stats.total_feedback }}</div>
+                        <div class="stat-label">Total Feedback</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value pending">{{ retrain_stats.pending_feedback }}</div>
+                        <div class="stat-label">Pending Training</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value processed">{{ retrain_stats.processed_feedback }}</div>
+                        <div class="stat-label">Already Processed</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="info-section">
+                <h3>📋 How Model Retraining Works</h3>
+                <p><strong>1. Feedback Collection:</strong> The system collects corrections you make during validation.</p>
+                <p><strong>2. Face Encoding:</strong> New face encodings are extracted from corrected images.</p>
+                <p><strong>3. Model Update:</strong> Person encodings are updated with the new training data.</p>
+                <p><strong>4. Model Rebuild:</strong> The face recognition model is reconstructed with improved accuracy.</p>
+            </div>
+            
+            <div class="retrain-section">
+                <h2>Start Model Retraining</h2>
+                {% if retrain_stats.pending_feedback > 0 %}
+                <p>There are {{ retrain_stats.pending_feedback }} pending corrections ready for training.</p>
+                {% else %}
+                <p>Force retrain the model with all available training data.</p>
+                {% endif %}
+                
+                <button class="btn-retrain" onclick="triggerRetrain()" id="retrainBtn">
+                    🚀 Start Retraining
+                </button>
+                
+                <div class="progress-section" id="progressSection">
+                    <h4>🔄 Retraining in Progress</h4>
+                    <div class="progress-text" id="progressText">Processing feedback...</div>
+                </div>
+                
+                <div class="result-section" id="resultSection">
+                    <h4 id="resultTitle">Result</h4>
+                    <div id="resultMessage">Training completed!</div>
+                </div>
+            </div>
+            
+            {% if retrain_stats.recent_corrections %}
+            <div class="recent-corrections">
+                <h3>Recent Corrections</h3>
+                <div class="corrections-list">
+                    {% for correction in retrain_stats.recent_corrections[:10] %}
+                    <div class="correction-item">
+                        <span class="correction-name">{{ correction[0] }}</span>
+                        <span class="correction-date">{{ correction[1] }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="toast" id="toast"></div>
+    
+    <script>
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast' + (isError ? ' error' : '');
+            toast.style.display = 'block';
+            
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 4000);
+        }
+        
+        async function triggerRetrain() {
+            const button = document.getElementById('retrainBtn');
+            const progressSection = document.getElementById('progressSection');
+            const resultSection = document.getElementById('resultSection');
+            const progressText = document.getElementById('progressText');
+            
+            // Hide previous results
+            resultSection.style.display = 'none';
+            
+            // Show progress
+            button.disabled = true;
+            button.textContent = '🔄 Training...';
+            progressSection.style.display = 'block';
+            
+            const startTime = Date.now();
+            
+            // Progress messages
+            const progressMessages = [
+                'Processing user feedback...',
+                'Extracting face encodings...',
+                'Updating person models...',
+                'Rebuilding recognition model...',
+                'Finalizing training...'
+            ];
+            
+            let progressIndex = 0;
+            const progressInterval = setInterval(() => {
+                progressIndex = (progressIndex + 1) % progressMessages.length;
+                progressText.textContent = progressMessages[progressIndex];
+            }, 1500);
+            
+            try {
+                const response = await fetch('/api/retrain', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const data = await response.json();
+                
+                // Clear progress animation
+                clearInterval(progressInterval);
+                progressSection.style.display = 'none';
+                
+                if (data.success) {
+                    const endTime = Date.now();
+                    const duration = (endTime - startTime) / 1000;
+                    const durationText = duration < 60 
+                        ? `${duration.toFixed(1)} seconds`
+                        : `${(duration / 60).toFixed(1)} minutes`;
+                    
+                    const message = data.training_time 
+                        ? `Model retrained successfully in ${data.training_time}!`
+                        : `Model retrained successfully in ${durationText}!`;
+                    
+                    showToast(message);
+                    
+                    // Show success result
+                    document.getElementById('resultTitle').textContent = '✅ Training Completed';
+                    document.getElementById('resultMessage').textContent = `Training completed in ${durationText}. The model has been updated with your corrections.`;
+                    resultSection.className = 'result-section success';
+                    resultSection.style.display = 'block';
+                    
+                    button.textContent = '✅ Training Completed';
+                    setTimeout(() => location.reload(), 3000);
+                } else {
+                    showToast(data.error || 'Training failed', true);
+                    
+                    // Show error result
+                    document.getElementById('resultTitle').textContent = '❌ Training Failed';
+                    document.getElementById('resultMessage').textContent = data.error || 'An error occurred during training.';
+                    resultSection.className = 'result-section error';
+                    resultSection.style.display = 'block';
+                    
+                    button.textContent = '🚀 Start Retraining';
+                    button.disabled = false;
+                }
+            } catch (error) {
+                clearInterval(progressInterval);
+                progressSection.style.display = 'none';
+                showToast('Connection error', true);
+                console.error('Error:', error);
+                
+                // Show error result
+                document.getElementById('resultTitle').textContent = '❌ Connection Error';
+                document.getElementById('resultMessage').textContent = 'Unable to connect to the training service.';
+                resultSection.className = 'result-section error';
+                resultSection.style.display = 'block';
+                
+                button.textContent = '🚀 Start Retraining';
+                button.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

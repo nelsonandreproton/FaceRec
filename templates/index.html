@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Recognition System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .intro-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .intro-section h2 {
+            color: #2c3e50;
+            font-size: 2em;
+            margin-bottom: 15px;
+        }
+        
+        .intro-section p {
+            color: #7f8c8d;
+            font-size: 1.1em;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+        
+        .feature-card {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+        
+        .feature-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+        
+        .feature-card h3 {
+            color: #2c3e50;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+        }
+        
+        .feature-card p {
+            color: #7f8c8d;
+            line-height: 1.5;
+        }
+        
+        .navigation-section {
+            margin-top: 50px;
+        }
+        
+        .nav-title {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 2em;
+            margin-bottom: 30px;
+        }
+        
+        .nav-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        
+        .nav-button {
+            display: block;
+            padding: 30px;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(52, 152, 219, 0.3);
+        }
+        
+        .nav-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(52, 152, 219, 0.4);
+        }
+        
+        .nav-button.validation {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            box-shadow: 0 10px 25px rgba(46, 204, 113, 0.3);
+        }
+        
+        .nav-button.validation:hover {
+            box-shadow: 0 15px 35px rgba(46, 204, 113, 0.4);
+        }
+        
+        .nav-button.stats {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            box-shadow: 0 10px 25px rgba(155, 89, 182, 0.3);
+        }
+        
+        .nav-button.stats:hover {
+            box-shadow: 0 15px 35px rgba(155, 89, 182, 0.4);
+        }
+        
+        .nav-button-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            display: block;
+        }
+        
+        .nav-button h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+        
+        .nav-button p {
+            opacity: 0.9;
+            font-size: 1em;
+        }
+        
+        .instructions {
+            background: #ecf0f1;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 40px 0;
+        }
+        
+        .instructions h3 {
+            color: #2c3e50;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .instructions ol {
+            color: #34495e;
+            line-height: 1.8;
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        .instructions strong {
+            color: #2c3e50;
+        }
+        
+        .status-info {
+            background: #e8f5e8;
+            border: 1px solid #27ae60;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .status-info h4 {
+            color: #27ae60;
+            margin-bottom: 10px;
+        }
+        
+        .status-info p {
+            color: #2c5530;
+        }
+        
+        .nav-links {
+            background: #f8f9fa;
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .nav-links a {
+            color: #3498db;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+            transition: color 0.3s ease;
+            padding: 8px 15px;
+            border-radius: 5px;
+        }
+        
+        .nav-links a:hover {
+            color: #2980b9;
+            background: #ecf0f1;
+        }
+        
+        .nav-links a.active {
+            color: #667eea;
+            background: #f0f3ff;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5em;
+            }
+            
+            .header p {
+                font-size: 1em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .nav-buttons {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .nav-links {
+                padding: 10px;
+            }
+            
+            .nav-links a {
+                display: block;
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Face Recognition System</h1>
+            <p>Intelligent platform for facial identification and validation</p>
+        </div>
+        
+        <div class="nav-links">
+            <a href="/validation">🔍 Validation</a>
+            <a href="/retrain">🔄 Training</a>
+            <a href="/stats">📈 Statistics</a>
+        </div>
+        
+        <div class="content">
+            <div class="intro-section">
+                <h2>Welcome to the Face Recognition System</h2>
+                <p>
+                    This system offers advanced facial recognition with an intuitive web interface for validation 
+                    and correction of detections. Use machine learning to automatically improve model accuracy 
+                    through user feedback.
+                </p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Intelligent Recognition</h3>
+                    <p>Automatic face detection and identification with high precision using advanced machine learning algorithms.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">✅</div>
+                    <h3>Web Validation</h3>
+                    <p>User-friendly interface to review, validate and correct identifications, ensuring continuous system improvement.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3>Automatic Retraining</h3>
+                    <p>The model learns from your corrections, automatically retraining to increase accuracy of future identifications.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Detailed Statistics</h3>
+                    <p>Monitor system performance with precision metrics, trend analysis and detailed reports.</p>
+                </div>
+            </div>
+            
+            <div class="instructions">
+                <h3>📋 How to Use the System</h3>
+                <ol>
+                    <li><strong>Validation:</strong> Access the validation page to review pending detections</li>
+                    <li><strong>Corrections:</strong> Mark identifications as correct or incorrect</li>
+                    <li><strong>Feedback:</strong> For incorrect identifications, select the correct person</li>
+                    <li><strong>Retraining:</strong> Use the "Retrain Model" page to apply corrections</li>
+                    <li><strong>Monitoring:</strong> Track accuracy and performance statistics</li>
+                </ol>
+            </div>
+            
+            <div class="navigation-section">
+                <h2 class="nav-title">Access System Features</h2>
+                
+                <div class="nav-buttons">
+                    <a href="/validation" class="nav-button validation">
+                        <span class="nav-button-icon">🔍</span>
+                        <h3>Detection Validation</h3>
+                        <p>Review and correct face identifications detected by the system</p>
+                    </a>
+                    
+                    <a href="/retrain" class="nav-button">
+                        <span class="nav-button-icon">🔄</span>
+                        <h3>Model Training</h3>
+                        <p>Improve model accuracy with validated corrections</p>
+                    </a>
+                    
+                    <a href="/stats" class="nav-button stats">
+                        <span class="nav-button-icon">📈</span>
+                        <h3>Statistics</h3>
+                        <p>View system performance metrics and accuracy data</p>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="status-info">
+                <h4>✅ System Operational</h4>
+                <p>
+                    All features are available. 
+                    Select one of the options above to start using the system.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Validação de Reconhecimento Facial</title>
+    <title>Face Recognition Validation</title>
     <style>
         * {
             margin: 0;
@@ -28,7 +28,7 @@
         }
         
         .header {
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
             color: white;
             padding: 30px;
             text-align: center;
@@ -229,6 +229,43 @@
             background: #e74c3c;
         }
         
+        .nav-links {
+            background: #f8f9fa;
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .nav-links a {
+            color: #3498db;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+            transition: color 0.3s ease;
+            padding: 8px 15px;
+            border-radius: 5px;
+        }
+        
+        .nav-links a:hover {
+            color: #2980b9;
+            background: #ecf0f1;
+        }
+        
+        .nav-links a.validation-active {
+            color: #27ae60;
+            background: #e8f5e8;
+        }
+        
+        .nav-links a.training-active {
+            color: #3498db;
+            background: #e3f2fd;
+        }
+        
+        .nav-links a.stats-active {
+            color: #9b59b6;
+            background: #f4ecf7;
+        }
+        
         .no-detections {
             text-align: center;
             padding: 50px;
@@ -244,6 +281,15 @@
                 flex-direction: column;
             }
             
+            .nav-links {
+                padding: 10px;
+            }
+            
+            .nav-links a {
+                display: block;
+                margin: 5px 0;
+            }
+            
             .stats-bar {
                 grid-template-columns: repeat(2, 1fr);
             }
@@ -253,48 +299,55 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🎯 Validação de Reconhecimento Facial</h1>
-            <p>Valide e corrija as identificações do sistema</p>
+            <h1>🎯 Face Recognition Validation</h1>
+            <p>Validate and correct system identifications</p>
+        </div>
+        
+        <div class="nav-links">
+            <a href="/">🏠 Home</a>
+            <a href="/validation" class="active validation-active">🔍 Validation</a>
+            <a href="/retrain">🔄 Training</a>
+            <a href="/stats">📈 Statistics</a>
         </div>
         
         <div class="stats-bar">
             <div class="stat-card">
                 <div class="stat-value">{{ stats.total }}</div>
-                <div class="stat-label">Total de Detecções</div>
+                <div class="stat-label">Total Detections</div>
             </div>
             <div class="stat-card">
                 <div class="stat-value pending">{{ stats.pending }}</div>
-                <div class="stat-label">Pendentes</div>
+                <div class="stat-label">Pending</div>
             </div>
             <div class="stat-card">
                 <div class="stat-value">{{ stats.verified }}</div>
-                <div class="stat-label">Verificadas</div>
+                <div class="stat-label">Verified</div>
             </div>
             <div class="stat-card">
                 <div class="stat-value accuracy">{{ "%.1f"|format(stats.accuracy) }}%</div>
-                <div class="stat-label">Precisão</div>
+                <div class="stat-label">Accuracy</div>
             </div>
         </div>
         
         <div class="content">
             {% if detections %}
-                <h2>Detecções Pendentes de Validação</h2>
+                <h2>Pending Detection Validations</h2>
                 
                 <div class="detection-grid">
                     {% for detection in detections %}
                     <div class="detection-card" data-detection-id="{{ detection.id }}">
                         <img src="/images/{{ detection.image_path.split('/')[-1] }}" 
-                             alt="Imagem detectada" 
+                             alt="Detected image" 
                              class="detection-image"
                              onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22250%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%23f8f9fa%22/><text x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 font-family=%22Arial%22 font-size=%2218%22 fill=%22%23999%22>Imagem não encontrada</text></svg>'">
                         
                         <div class="detection-info">
                             <div class="detected-name">
-                                {{ detection.detected_name or 'Desconhecido' }}
+                                {{ detection.detected_name or 'Unknown' }}
                             </div>
                             
                             <span class="confidence {{ 'high-confidence' if detection.confidence_score > 0.7 else ('low-confidence' if detection.confidence_score < 0.4 else '') }}">
-                                Confiança: {{ "%.0f"|format(detection.confidence_score * 100) }}%
+                                Confidence: {{ "%.0f"|format(detection.confidence_score * 100) }}%
                             </span>
                             
                             <div class="timestamp">
@@ -304,23 +357,23 @@
                             <div class="validation-controls">
                                 <div class="button-group">
                                     <button class="btn btn-correct" onclick="markCorrect({{ detection.id }})">
-                                        ✅ Correto
+                                        ✅ Correct
                                     </button>
                                     <button class="btn btn-incorrect" onclick="showCorrection({{ detection.id }})">
-                                        ❌ Incorreto
+                                        ❌ Incorrect
                                     </button>
                                 </div>
                                 
                                 <div class="correction-panel" id="correction-{{ detection.id }}">
-                                    <label>Pessoa correta:</label>
+                                    <label>Correct person:</label>
                                     <select id="person-{{ detection.id }}">
-                                        <option value="">Desconhecido</option>
+                                        <option value="">Unknown</option>
                                         {% for person in people %}
                                         <option value="{{ person.id }}">{{ person.name }}</option>
                                         {% endfor %}
                                     </select>
                                     <button class="btn btn-submit" onclick="submitCorrection({{ detection.id }})">
-                                        Confirmar Correção
+                                        Confirm Correction
                                     </button>
                                 </div>
                             </div>
@@ -329,34 +382,10 @@
                     {% endfor %}
                 </div>
                 
-                <div class="retrain-section">
-                    <h3>🔄 Retreino do Modelo</h3>
-                    {% if stats.pending_feedback > 0 %}
-                    <p>Existem {{ stats.pending_feedback }} correções pendentes para retreino.</p>
-                    {% else %}
-                    <p>Force o retreino do modelo com todos os dados disponíveis.</p>
-                    {% endif %}
-                    <button class="btn btn-retrain" onclick="triggerRetrain()">
-                        Retreinar Modelo
-                    </button>
-                </div>
-                
             {% else %}
                 <div class="no-detections">
-                    <h2>🎉 Parabéns!</h2>
-                    <p>Não há detecções pendentes de validação.</p>
-                </div>
-                
-                <div class="retrain-section">
-                    <h3>🔄 Retreino do Modelo</h3>
-                    {% if stats.pending_feedback > 0 %}
-                    <p>Existem {{ stats.pending_feedback }} correções pendentes para retreino.</p>
-                    {% else %}
-                    <p>Force o retreino do modelo com todos os dados disponíveis.</p>
-                    {% endif %}
-                    <button class="btn btn-retrain" onclick="triggerRetrain()">
-                        Retreinar Modelo
-                    </button>
+                    <h2>🎉 Congratulations!</h2>
+                    <p>No pending detections for validation.</p>
                 </div>
             {% endif %}
         </div>
@@ -409,7 +438,7 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    showToast('Validação registrada com sucesso!');
+                    showToast('Validation registered successfully!');
                     
                     // Remover card da interface
                     const card = document.querySelector(`[data-detection-id="${detectionId}"]`);
@@ -426,80 +455,14 @@
                         }
                     }, 500);
                 } else {
-                    showToast(data.error || 'Erro ao validar detecção', true);
+                    showToast(data.error || 'Error validating detection', true);
                 }
             } catch (error) {
-                showToast('Erro de conexão', true);
-                console.error('Erro:', error);
+                showToast('Connection error', true);
+                console.error('Error:', error);
             }
         }
         
-        async function triggerRetrain() {
-            const button = event.target;
-            const originalText = button.textContent;
-            const startTime = Date.now();
-            
-            // Show processing indicator
-            button.innerHTML = '🔄 <span id="retrain-progress">Processando feedbacks...</span>';
-            button.disabled = true;
-            
-            // Start progress animation
-            const progressMessages = [
-                'Processando feedbacks...',
-                'Extraindo encodings...',
-                'Atualizando modelo...',
-                'Finalizando retreino...'
-            ];
-            
-            let progressIndex = 0;
-            const progressInterval = setInterval(() => {
-                progressIndex = (progressIndex + 1) % progressMessages.length;
-                const progressElement = document.getElementById('retrain-progress');
-                if (progressElement) {
-                    progressElement.textContent = progressMessages[progressIndex];
-                }
-            }, 1500);
-            
-            try {
-                const response = await fetch('/api/retrain', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                });
-                
-                const data = await response.json();
-                
-                // Clear progress animation
-                clearInterval(progressInterval);
-                
-                if (data.success) {
-                    const endTime = Date.now();
-                    const duration = (endTime - startTime) / 1000;
-                    const durationText = duration < 60 
-                        ? `${duration.toFixed(1)} segundos`
-                        : `${(duration / 60).toFixed(1)} minutos`;
-                    
-                    const message = data.training_time 
-                        ? `Modelo retreinado com sucesso em ${data.training_time}!`
-                        : `Modelo retreinado com sucesso em ${durationText}!`;
-                    
-                    showToast(message);
-                    button.innerHTML = `✅ Retreino concluído (${durationText})`;
-                    setTimeout(() => location.reload(), 3000);
-                } else {
-                    showToast(data.error || 'Erro no retreino', true);
-                    button.textContent = originalText;
-                    button.disabled = false;
-                }
-            } catch (error) {
-                clearInterval(progressInterval);
-                showToast('Erro de conexão', true);
-                console.error('Erro:', error);
-                button.textContent = originalText;
-                button.disabled = false;
-            }
-        }
     </script>
 </body>
 </html>

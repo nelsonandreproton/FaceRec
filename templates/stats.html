@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estatísticas - Reconhecimento Facial</title>
+    <title>Statistics - Face Recognition System</title>
     <style>
         * {
             margin: 0;
@@ -28,7 +28,7 @@
         }
         
         .header {
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
             color: white;
             padding: 30px;
             text-align: center;
@@ -118,9 +118,41 @@
             transition: width 0.5s ease;
         }
         
-        .nav-buttons {
+        .nav-links {
+            background: #f8f9fa;
+            padding: 15px;
             text-align: center;
-            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .nav-links a {
+            color: #3498db;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+            transition: color 0.3s ease;
+            padding: 8px 15px;
+            border-radius: 5px;
+        }
+        
+        .nav-links a:hover {
+            color: #2980b9;
+            background: #ecf0f1;
+        }
+        
+        .nav-links a.validation-active {
+            color: #27ae60;
+            background: #e8f5e8;
+        }
+        
+        .nav-links a.training-active {
+            color: #3498db;
+            background: #e3f2fd;
+        }
+        
+        .nav-links a.stats-active {
+            color: #9b59b6;
+            background: #f4ecf7;
         }
         
         .btn {
@@ -165,77 +197,95 @@
             color: #7f8c8d;
             font-size: 0.9em;
         }
+        
+        @media (max-width: 768px) {
+            .nav-links {
+                padding: 10px;
+            }
+            
+            .nav-links a {
+                display: block;
+                margin: 5px 0;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>📊 Estatísticas do Sistema</h1>
-            <p>Análise detalhada do desempenho do reconhecimento facial</p>
+            <h1>📊 System Statistics</h1>
+            <p>Detailed analysis of face recognition performance</p>
+        </div>
+        
+        <div class="nav-links">
+            <a href="/">🏠 Home</a>
+            <a href="/validation">🔍 Validation</a>
+            <a href="/retrain">🔄 Training</a>
+            <a href="/stats" class="active stats-active">📈 Statistics</a>
         </div>
         
         <div class="content">
-            <div class="nav-buttons">
-                <a href="/" class="btn">← Voltar à Validação</a>
-                <a href="/api/retrain" class="btn" onclick="event.preventDefault(); triggerRetrain()">🔄 Retreinar Modelo</a>
-            </div>
             
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-value">{{ stats.total }}</div>
-                    <div class="stat-label">Total de Detecções</div>
+                    <div class="stat-label">Total Detections</div>
                 </div>
                 
                 <div class="stat-card success">
                     <div class="stat-value">{{ stats.verified }}</div>
-                    <div class="stat-label">Verificadas</div>
+                    <div class="stat-label">Verified</div>
                 </div>
                 
                 <div class="stat-card warning">
                     <div class="stat-value">{{ stats.pending }}</div>
-                    <div class="stat-label">Pendentes</div>
+                    <div class="stat-label">Pending</div>
                 </div>
                 
                 <div class="stat-card {{ 'success' if stats.accuracy > 80 else ('warning' if stats.accuracy > 60 else 'danger') }}">
                     <div class="stat-value">{{ "%.1f"|format(stats.accuracy) }}%</div>
-                    <div class="stat-label">Precisão</div>
+                    <div class="stat-label">Accuracy</div>
                 </div>
             </div>
             
             <div class="chart-section">
-                <div class="chart-title">Progresso de Verificação</div>
+                <div class="chart-title">Verification Progress</div>
                 <div class="progress-bar">
                     <div class="progress-fill" style="width: {{ (stats.verified / stats.total * 100) if stats.total > 0 else 0 }}%">
                         {{ "%.0f"|format((stats.verified / stats.total * 100) if stats.total > 0 else 0) }}%
                     </div>
                 </div>
                 <p style="text-align: center; color: #7f8c8d;">
-                    {{ stats.verified }} de {{ stats.total }} detecções verificadas
+                    {{ stats.verified }} of {{ stats.total }} detections verified
                 </p>
             </div>
             
             <div class="chart-section">
-                <div class="chart-title">Precisão do Sistema</div>
+                <div class="chart-title">System Accuracy</div>
                 <div class="progress-bar">
                     <div class="progress-fill" style="width: {{ stats.accuracy }}%; background: {{ 'linear-gradient(90deg, #27ae60, #2ecc71)' if stats.accuracy > 80 else ('linear-gradient(90deg, #f39c12, #e67e22)' if stats.accuracy > 60 else 'linear-gradient(90deg, #e74c3c, #c0392b)') }};">
                         {{ "%.1f"|format(stats.accuracy) }}%
                     </div>
                 </div>
                 <p style="text-align: center; color: #7f8c8d;">
-                    {{ stats.correct }} identificações corretas de {{ stats.verified }} verificadas
+                    {{ stats.correct }} correct identifications out of {{ stats.verified }} verified
                 </p>
             </div>
             
             {% if stats.pending_feedback > 0 %}
             <div class="chart-section">
-                <div class="chart-title">⚠️ Ação Necessária</div>
+                <div class="chart-title">⚠️ Action Required</div>
                 <p style="text-align: center; font-size: 1.2em; color: #e74c3c;">
-                    <strong>{{ stats.pending_feedback }}</strong> correções pendentes para retreino do modelo
+                    <strong>{{ stats.pending_feedback }}</strong> pending corrections for model retraining
                 </p>
                 <div style="text-align: center; margin-top: 20px;">
-                    <button class="btn" onclick="triggerRetrain()" style="background: #9b59b6; font-size: 1.1em; padding: 15px 30px;">
-                        🔄 Retreinar Modelo Agora
-                    </button>
+                    <a href="/retrain" class="btn" style="background: #9b59b6; font-size: 1.1em; padding: 15px 30px; text-decoration: none;">
+                        🔄 Go to Retraining Page
+                    </a>
                 </div>
             </div>
             {% endif %}
@@ -243,37 +293,7 @@
     </div>
     
     <script>
-        async function triggerRetrain() {
-            const button = event.target;
-            const originalText = button.textContent;
-            
-            button.textContent = '🔄 Retreinando...';
-            button.disabled = true;
-            
-            try {
-                const response = await fetch('/api/retrain', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    alert('Modelo retreinado com sucesso!');
-                    location.reload();
-                } else {
-                    alert('Erro no retreino: ' + (data.error || 'Erro desconhecido'));
-                }
-            } catch (error) {
-                alert('Erro de conexão');
-                console.error('Erro:', error);
-            } finally {
-                button.textContent = originalText;
-                button.disabled = false;
-            }
-        }
+        // No JavaScript needed for navigation-only stats page
     </script>
 </body>
 </html>
