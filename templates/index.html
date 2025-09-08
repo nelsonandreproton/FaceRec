@@ -146,6 +146,15 @@
             box-shadow: 0 15px 35px rgba(46, 204, 113, 0.4);
         }
         
+        .nav-button.capture {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);
+            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.3);
+        }
+        
+        .nav-button.capture:hover {
+            box-shadow: 0 15px 35px rgba(255, 107, 107, 0.4);
+        }
+        
         .nav-button.stats {
             background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
             box-shadow: 0 10px 25px rgba(155, 89, 182, 0.3);
@@ -288,6 +297,7 @@
         
         <div class="nav-links">
             <a href="/validation">🔍 Validation</a>
+            <a href="/capture">📷 Mobile Capture</a>
             <a href="/retrain">🔄 Training</a>
             <a href="/stats">📈 Statistics</a>
         </div>
@@ -353,6 +363,12 @@
                         <span class="nav-button-icon">🔄</span>
                         <h3>Model Training</h3>
                         <p>Improve model accuracy with validated corrections</p>
+                    </a>
+                    
+                    <a href="/capture" class="nav-button capture">
+                        <span class="nav-button-icon">📷</span>
+                        <h3>Mobile Capture</h3>
+                        <p>Take photos with your phone for instant face recognition</p>
                     </a>
                     
                     <a href="/stats" class="nav-button stats">

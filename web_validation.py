@@ -7,6 +7,9 @@ import base64
 from datetime import datetime
 import json
 from config import config
+from werkzeug.utils import secure_filename
+import uuid
+from face_recognizer import FaceRecognizer
 
 app = Flask(__name__)
 
@@ -223,6 +226,116 @@ def trigger_retrain():
             return jsonify({'error': 'Falha no retreino do modelo'}), 500
     except Exception as e:
         return jsonify({'error': f'Erro no retreino: {str(e)}'}), 500
+
+@app.route('/capture')
+def capture():
+    """Página de captura móvel"""
+    return render_template('capture.html')
+
+@app.route('/api/upload-photo', methods=['POST'])
+def upload_photo():
+    """API para upload e processamento de fotos"""
+    try:
+        if 'image' not in request.files:
+            return jsonify({'success': False, 'error': 'Nenhuma imagem enviada'}), 400
+        
+        file = request.files['image']
+        if file.filename == '':
+            return jsonify({'success': False, 'error': 'Nenhum arquivo selecionado'}), 400
+        
+        if not allowed_file(file.filename):
+            return jsonify({'success': False, 'error': 'Tipo de arquivo não suportado'}), 400
+        
+        # Gerar nome único para o arquivo
+        file_extension = os.path.splitext(secure_filename(file.filename))[1].lower()
+        unique_filename = f"mobile_capture_{uuid.uuid4().hex}{file_extension}"
+        
+        # Criar pasta captured_images se não existir
+        capture_dir = os.path.join(config.IMAGES_BASE_PATH, 'captured_images')
+        os.makedirs(capture_dir, exist_ok=True)
+        
+        # Salvar arquivo
+        file_path = os.path.join(capture_dir, unique_filename)
+        file.save(file_path)
+        
+        # Processar imagem com face recognition
+        recognizer = FaceRecognizer()
+        result = recognizer.recognize_face_in_image(file_path)
+        
+        if result and len(result) >= 3:
+            detected_name, confidence, status = result[0], result[1], result[2]
+            
+            # Salvar detecção na base de dados
+            detection_id = save_detection_to_db(
+                image_path=os.path.join('captured_images', unique_filename),
+                detected_name=detected_name,
+                confidence=confidence,
+                source='mobile_capture'
+            )
+            
+            if detected_name and detected_name != "Desconhecido":
+                detections = [{
+                    'name': detected_name,
+                    'confidence': confidence,
+                    'detection_id': detection_id
+                }]
+                return jsonify({
+                    'success': True,
+                    'detections': detections,
+                    'message': 'Face detectada com sucesso!'
+                })
+            else:
+                return jsonify({
+                    'success': True,
+                    'detections': [],
+                    'message': 'Nenhuma face conhecida detectada na imagem.'
+                })
+        else:
+            return jsonify({
+                'success': True,
+                'detections': [],
+                'message': 'Nenhuma face detectada na imagem.'
+            })
+            
+    except Exception as e:
+        return jsonify({'success': False, 'error': f'Erro ao processar imagem: {str(e)}'}), 500
+
+def allowed_file(filename):
+    """Verificar se o tipo de arquivo é permitido"""
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'bmp', 'tiff'}
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def save_detection_to_db(image_path, detected_name, confidence, source='file'):
+    """Salvar detecção na base de dados"""
+    conn = sqlite3.connect(config.DB_PATH)
+    cursor = conn.cursor()
+    
+    try:
+        # Encontrar ID da pessoa detectada
+        detected_person_id = None
+        if detected_name and detected_name != "Desconhecido":
+            cursor.execute("SELECT id FROM people WHERE name = ?", (detected_name,))
+            result = cursor.fetchone()
+            if result:
+                detected_person_id = result[0]
+        
+        # Inserir detecção
+        cursor.execute("""
+            INSERT INTO detections (image_path, detected_name, detected_person_id, 
+                                  confidence_score, timestamp, source, is_verified)
+            VALUES (?, ?, ?, ?, ?, ?, FALSE)
+        """, (image_path, detected_name, detected_person_id, confidence, 
+              datetime.now().isoformat(), source))
+        
+        detection_id = cursor.lastrowid
+        conn.commit()
+        return detection_id
+        
+    except Exception as e:
+        print(f"Erro ao salvar detecção: {e}")
+        return None
+    finally:
+        conn.close()
 
 if __name__ == '__main__':
     # Print configuration

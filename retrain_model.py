@@ -50,12 +50,19 @@ class RetainModel:
             image_path = feedback['image_path']
             correct_name = feedback['correct_prediction']
             
-            if not os.path.exists(image_path) or correct_name == "Desconhecido":
+            # Construir caminho completo se necessário
+            if not os.path.isabs(image_path):
+                full_image_path = os.path.join(config.IMAGES_BASE_PATH, image_path)
+            else:
+                full_image_path = image_path
+            
+            if not os.path.exists(full_image_path) or correct_name == "Desconhecido":
+                print(f"⚠️ Saltando: {full_image_path} (existe: {os.path.exists(full_image_path)}, nome: {correct_name})")
                 continue
             
             try:
                 # Carregar imagem e extrair encoding
-                image = face_recognition.load_image_file(image_path)
+                image = face_recognition.load_image_file(full_image_path)
                 face_encodings = face_recognition.face_encodings(image)
                 
                 if face_encodings:
@@ -66,10 +73,10 @@ class RetainModel:
                     })
                     print(f"✅ Encoding extraído para {correct_name}")
                 else:
-                    print(f"⚠️ Nenhuma face encontrada em {image_path}")
+                    print(f"⚠️ Nenhuma face encontrada em {full_image_path}")
                     
             except Exception as e:
-                print(f"❌ Erro ao processar {image_path}: {e}")
+                print(f"❌ Erro ao processar {full_image_path}: {e}")
         
         return corrections
     

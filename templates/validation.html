@@ -306,6 +306,7 @@
         <div class="nav-links">
             <a href="/">🏠 Home</a>
             <a href="/validation" class="active validation-active">🔍 Validation</a>
+            <a href="/capture">📷 Mobile Capture</a>
             <a href="/retrain">🔄 Training</a>
             <a href="/stats">📈 Statistics</a>
         </div>
@@ -336,7 +337,7 @@
                 <div class="detection-grid">
                     {% for detection in detections %}
                     <div class="detection-card" data-detection-id="{{ detection.id }}">
-                        <img src="/images/{{ detection.image_path.split('/')[-1] }}" 
+                        <img src="/images/{{ detection.image_path }}" 
                              alt="Detected image" 
                              class="detection-image"
                              onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22250%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%23f8f9fa%22/><text x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 font-family=%22Arial%22 font-size=%2218%22 fill=%22%23999%22>Imagem não encontrada</text></svg>'">

@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📷 Captura Móvel - Face Recognition</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+            padding: 20px;
+            text-align: center;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .nav-menu {
+            background: #f8f9fa;
+            padding: 10px 0;
+            text-align: center;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .nav-menu a {
+            display: inline-block;
+            margin: 0 15px;
+            padding: 8px 16px;
+            text-decoration: none;
+            color: #6c757d;
+            border-radius: 20px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-menu a:hover {
+            background: #ff6b6b;
+            color: white;
+        }
+        
+        .capture-section {
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        .upload-area {
+            border: 3px dashed #ff6b6b;
+            border-radius: 15px;
+            padding: 40px 20px;
+            margin: 20px 0;
+            background: #fff5f5;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .upload-area:hover {
+            border-color: #ff8e53;
+            background: #fff0f0;
+        }
+        
+        .upload-area.dragover {
+            border-color: #ff8e53;
+            background: #fff0f0;
+            transform: scale(1.02);
+        }
+        
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #ff6b6b;
+        }
+        
+        .upload-text {
+            font-size: 16px;
+            color: #495057;
+            margin-bottom: 10px;
+        }
+        
+        .upload-subtext {
+            font-size: 12px;
+            color: #868e96;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .btn-capture {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+        
+        .btn-capture:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+        }
+        
+        .btn-capture:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .preview-section {
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .preview-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .result-section {
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+        }
+        
+        .result-success {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        
+        .result-error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        
+        .result-info {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .loading-spinner {
+            display: none;
+            margin: 20px 0;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #ff6b6b;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .detection-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid #ff6b6b;
+        }
+        
+        .detection-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 5px;
+        }
+        
+        .detection-confidence {
+            font-size: 14px;
+            color: #868e96;
+        }
+        
+        .confidence-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            margin: 8px 0;
+            overflow: hidden;
+        }
+        
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #ff8e53);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                margin: 5px;
+                border-radius: 15px;
+            }
+            
+            .header {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .capture-section {
+                padding: 20px 15px;
+            }
+            
+            .upload-area {
+                padding: 30px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📷 Captura Móvel</h1>
+            <p>Tire uma foto para reconhecimento facial</p>
+        </div>
+        
+        <div class="nav-menu">
+            <a href="/">🏠 Home</a>
+            <a href="/validation">🔍 Validação</a>
+            <a href="/capture" style="background: #ff6b6b; color: white;">📷 Mobile Capture</a>
+            <a href="/retrain">🔄 Treino</a>
+            <a href="/stats">📈 Stats</a>
+        </div>
+        
+        <div class="capture-section">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📷</div>
+                <div class="upload-text">Toque para tirar foto</div>
+                <div class="upload-subtext">ou arraste uma imagem aqui</div>
+                <input type="file" id="fileInput" class="file-input" accept="image/*" capture="camera">
+            </div>
+            
+            <button class="btn-capture" onclick="document.getElementById('fileInput').click()">
+                📱 Abrir Câmara
+            </button>
+            
+            <div class="preview-section" id="previewSection">
+                <img id="previewImage" class="preview-image" alt="Preview">
+                <br><br>
+                <button class="btn-capture" onclick="processImage()" id="processBtn">
+                    🔍 Processar Imagem
+                </button>
+            </div>
+            
+            <div class="loading-spinner" id="loadingSpinner">
+                <div class="spinner"></div>
+                <p>Processando imagem...</p>
+            </div>
+            
+            <div class="result-section" id="resultSection">
+                <!-- Resultados aparecerão aqui -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const uploadArea = document.getElementById('uploadArea');
+        const previewSection = document.getElementById('previewSection');
+        const previewImage = document.getElementById('previewImage');
+        const processBtn = document.getElementById('processBtn');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const resultSection = document.getElementById('resultSection');
+        
+        let currentFile = null;
+        
+        // Upload area events
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', handleDragOver);
+        uploadArea.addEventListener('dragleave', handleDragLeave);
+        uploadArea.addEventListener('drop', handleDrop);
+        
+        // File input change
+        fileInput.addEventListener('change', handleFileSelect);
+        
+        function handleDragOver(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        }
+        
+        function handleDragLeave(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        }
+        
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        }
+        
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                showResult('Erro: Por favor selecione uma imagem válida.', 'error');
+                return;
+            }
+            
+            currentFile = file;
+            
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImage.src = e.target.result;
+                previewSection.style.display = 'block';
+                resultSection.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        async function processImage() {
+            if (!currentFile) return;
+            
+            // Show loading
+            processBtn.disabled = true;
+            loadingSpinner.style.display = 'block';
+            resultSection.style.display = 'none';
+            
+            try {
+                const formData = new FormData();
+                formData.append('image', currentFile);
+                
+                const response = await fetch('/api/upload-photo', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showProcessingResult(result);
+                } else {
+                    showResult(`Erro: ${result.error}`, 'error');
+                }
+                
+            } catch (error) {
+                showResult(`Erro de conexão: ${error.message}`, 'error');
+            } finally {
+                loadingSpinner.style.display = 'none';
+                processBtn.disabled = false;
+            }
+        }
+        
+        function showProcessingResult(result) {
+            let html = '';
+            
+            if (result.detections && result.detections.length > 0) {
+                html += '<h3>🎯 Faces Detectadas:</h3>';
+                result.detections.forEach(detection => {
+                    const confidence = Math.round(detection.confidence * 100);
+                    html += `
+                        <div class="detection-card">
+                            <div class="detection-name">${detection.name || 'Desconhecido'}</div>
+                            <div class="detection-confidence">Confiança: ${confidence}%</div>
+                            <div class="confidence-bar">
+                                <div class="confidence-fill" style="width: ${confidence}%"></div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `
+                    <div style="margin-top: 20px; padding: 15px; background: #e8f5e8; border-radius: 10px;">
+                        <strong>✅ Imagem guardada para validação!</strong><br>
+                        <small>Pode validar os resultados em <a href="/validation">Validação</a></small>
+                    </div>
+                `;
+                
+                resultSection.className = 'result-section result-success';
+            } else {
+                html = `
+                    <h3>❌ Nenhuma face detectada</h3>
+                    <p>Tente com uma imagem mais clara ou com faces mais visíveis.</p>
+                `;
+                resultSection.className = 'result-section result-info';
+            }
+            
+            resultSection.innerHTML = html;
+            resultSection.style.display = 'block';
+        }
+        
+        function showResult(message, type) {
+            resultSection.innerHTML = `<p>${message}</p>`;
+            resultSection.className = `result-section result-${type}`;
+            resultSection.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

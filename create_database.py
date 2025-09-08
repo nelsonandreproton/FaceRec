@@ -30,6 +30,7 @@ def create_database():
             detected_name TEXT,
             confidence_score REAL,
             timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            source TEXT DEFAULT 'file',
             is_verified BOOLEAN DEFAULT FALSE,
             correct_person_id INTEGER,
             feedback TEXT,
@@ -51,6 +52,16 @@ def create_database():
             FOREIGN KEY (detection_id) REFERENCES detections(id)
         )
     """)
+    
+    # Adicionar coluna source se não existir (para bases de dados existentes)
+    try:
+        cursor.execute("ALTER TABLE detections ADD COLUMN source TEXT DEFAULT 'file'")
+        print("✅ Coluna 'source' adicionada à tabela detections")
+    except sqlite3.OperationalError as e:
+        if "duplicate column name" in str(e).lower():
+            print("ℹ️ Coluna 'source' já existe na tabela detections")
+        else:
+            print(f"⚠️ Aviso ao adicionar coluna 'source': {e}")
     
     conn.commit()
     conn.close()

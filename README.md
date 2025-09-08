@@ -12,12 +12,14 @@ A comprehensive facial recognition system with web-based validation interface, a
 
 ### 🌐 **Web Interface** 
 - **Landing Page**: System overview with color-coded navigation to all features
+- **Mobile Capture** (🟠): Take photos with your phone for instant face recognition and processing
 - **Validation Interface** (🟢): Review and correct misidentified faces with intuitive controls
 - **Training Dashboard** (🔵): Dedicated retraining interface with progress tracking and time estimates
 - **Statistics Portal** (🟣): Comprehensive performance metrics and analytics dashboard
 
 ### 🚀 **User Experience**
-- **Color-Coded Navigation**: Green (validation), Blue (training), Purple (statistics)
+- **Color-Coded Navigation**: Orange (mobile capture), Green (validation), Blue (training), Purple (statistics)
+- **Mobile-First Design**: Optimized interface for smartphone camera capture
 - **Real-time Feedback**: Instant confirmation of actions and status updates
 - **Progress Tracking**: Visual indicators during model training with time estimates
 - **Mobile Responsive**: Optimized interface works on desktop, tablet, and mobile
@@ -111,23 +113,38 @@ Start the web application server:
 python web_validation.py
 ```
 
-Visit http://localhost:5000 to access the complete web interface. See the [Web Interface](#-web-interface) section below for detailed page descriptions.
+Visit http://localhost:5000 to access the complete web interface with these features:
+
+- **📱 Mobile Capture** (`/capture`): Take photos with your phone for instant processing
+- **🔍 Validation** (`/validation`): Review and correct face identifications  
+- **🔄 Training** (`/retrain`): Improve model accuracy with feedback
+- **📈 Statistics** (`/stats`): Monitor system performance
+
+See the [Web Interface](#-web-interface) section below for detailed page descriptions.
 
 ### 2. Face Recognition Processing
 
-#### Current Implementation
-The system currently processes images from files stored in the `test_images/` directory:
+#### Mobile Capture (Recommended)
+Use your smartphone to capture and process images in real-time:
+
+1. **Access**: Visit `http://localhost:5000/capture` on your phone
+2. **Capture**: Tap "📱 Abrir Câmara" to take a photo
+3. **Process**: Tap "🔍 Processar Imagem" for instant recognition
+4. **Review**: Results appear immediately with confidence scores
+5. **Validate**: Use `/validation` to correct any misidentifications
+
+**Features:**
+- ✅ **Real-time processing** with instant results
+- ✅ **Auto-save** to database for validation
+- ✅ **Mobile-optimized** interface with drag & drop
+- ✅ **Progress indicators** and confidence scores
+
+#### File-based Processing
+Alternative method for batch processing:
 
 ```bash
 python face_recognizer.py path/to/image.jpg
 ```
-
-**Image Processing Workflow:**
-1. Place images in the `test_images/` folder
-2. Run the face recognition script with the image path
-3. The system detects and identifies faces in the image
-4. Results are stored in the database for validation
-5. Use the web interface to review and correct any misidentifications
 
 **Supported Image Formats:** JPG, JPEG, PNG, BMP, TIFF
 
@@ -219,6 +236,7 @@ The web interface features a **color-coded design** for easy navigation:
 
 **📋 Navigation Menu** (consistent across all pages):
 - **Home** (🏠) - System overview and feature access
+- **Mobile Capture** (📷) - Smartphone photo capture and processing
 - **Validation** (🔍) - Detection review and correction
 - **Training** (🔄) - Model retraining interface
 - **Statistics** (📈) - Performance metrics and analytics
@@ -229,6 +247,14 @@ The web interface features a **color-coded design** for easy navigation:
 - **System Overview**: Feature descriptions and getting started guide
 - **Quick Access**: Direct navigation to all major functions
 - **Color-Coded Cards**: Visual organization by function type
+
+#### **Mobile Capture Page (/capture)** 🟠
+- **Camera Integration**: Direct access to smartphone camera via web browser
+- **Real-time Processing**: Instant face recognition on captured images
+- **Progress Indicators**: Visual feedback during image processing with confidence scores
+- **Auto-save**: Captured images automatically saved to `captured_images/` directory
+- **Drag & Drop Support**: Alternative upload method for existing images
+- **Mobile Responsive**: Optimized touch interface for smartphones and tablets
 
 #### **Validation Page (/validation)** 🟢
 - **Detection Cards**: Visual display of detected faces with confidence scores
@@ -252,9 +278,11 @@ The web interface features a **color-coded design** for easy navigation:
 ### API Endpoints
 
 - `GET /` - Landing page with system overview
+- `GET /capture` - Mobile photo capture interface
 - `GET /validation` - Detection validation interface
 - `GET /retrain` - Model retraining interface
 - `GET /stats` - Statistics and analytics dashboard
+- `POST /api/upload-photo` - Upload and process mobile photos
 - `POST /api/validate` - Validate a detection
 - `POST /api/retrain` - Trigger model retraining
 - `GET /images/<filename>` - Serve detection images
@@ -262,9 +290,10 @@ The web interface features a **color-coded design** for easy navigation:
 ## 🔄 Model Retraining Workflow
 
 ### Web Interface Workflow
-1. **Validation** (🟢): Review and correct face detections on `/validation` page
-2. **Training** (🔵): Monitor feedback and trigger retraining on `/retrain` page  
-3. **Analytics** (🟣): Track improvements and performance on `/stats` page
+1. **Capture** (🟠): Take photos using mobile interface on `/capture` page
+2. **Validation** (🟢): Review and correct face detections on `/validation` page
+3. **Training** (🔵): Monitor feedback and trigger retraining on `/retrain` page  
+4. **Analytics** (🟣): Track improvements and performance on `/stats` page
 
 ### Technical Process
 1. **Feedback Collection**: System collects corrections from validation interface
@@ -404,12 +433,13 @@ For issues and questions:
 ## 🗺️ Roadmap
 
 ### 🎯 **Current Version (v1.0)**
-- ✅ File-based image processing
-- ✅ Web validation interface with color-coded navigation
-- ✅ Automatic model retraining with user feedback
-- ✅ Statistics dashboard and performance monitoring
-- ✅ Home Assistant integration
-- ✅ Mobile-responsive design
+- ✅ **Mobile photo capture** with real-time processing
+- ✅ **File-based image processing** for batch operations
+- ✅ **Web validation interface** with color-coded navigation
+- ✅ **Automatic model retraining** with user feedback
+- ✅ **Statistics dashboard** and performance monitoring
+- ✅ **Home Assistant integration**
+- ✅ **Mobile-responsive design** optimized for smartphones
 
 ### 🔮 **Upcoming Features (v2.0)**
 - 📷 **Real-time Camera Integration** (see [Face Recognition Processing](#2-face-recognition-processing) for details)
